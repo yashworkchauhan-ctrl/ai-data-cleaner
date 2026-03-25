@@ -4,13 +4,15 @@ import {
   BarChart, Bar, XAxis, YAxis, Tooltip, CartesianGrid
 } from "recharts";
 
+// ✅ 🔥 ADD THIS (IMPORTANT)
+const API = "https://ai-backend-hbz2.onrender.com";
+
 function App() {
   const [data, setData] = useState(null);
   const [theme, setTheme] = useState("light");
   const [active, setActive] = useState("upload");
   const [loading, setLoading] = useState(false);
 
-  // 🔥 NEW (PREDICTION STATES)
   const [inputValues, setInputValues] = useState({});
   const [predictionResult, setPredictionResult] = useState(null);
 
@@ -30,10 +32,8 @@ function App() {
 
       setLoading(true);
 
-      const res = await axios.post(
-        "http://127.0.0.1:8000/upload",
-        formData
-      );
+      // ✅ FIXED
+      const res = await axios.post(`${API}/upload`, formData);
 
       const response = res.data;
 
@@ -67,7 +67,8 @@ function App() {
     try {
       setLoading(true);
 
-      const res = await axios.get("http://127.0.0.1:8000/train");
+      // ✅ FIXED
+      const res = await axios.get(`${API}/train`);
       const response = res.data;
 
       if (!response || typeof response !== "object") {
@@ -106,10 +107,8 @@ function App() {
     try {
       setLoading(true);
 
-      const res = await axios.post(
-        "http://127.0.0.1:8000/predict",
-        inputValues
-      );
+      // ✅ FIXED
+      const res = await axios.post(`${API}/predict`, inputValues);
 
       const response = res.data;
 
@@ -144,7 +143,8 @@ function App() {
       background: dark
         ? "linear-gradient(135deg, #020617, #0f172a)"
         : "linear-gradient(135deg, #eef2ff, #f8fafc)",
-      fontFamily: "Inter, sans-serif"
+      fontFamily: "Inter, sans-serif",
+      color: dark ? "#fff" : "#000" // ✅ TEXT FIX
     },
 
     sidebar: {
@@ -183,7 +183,8 @@ function App() {
       borderRadius: "20px",
       boxShadow: "0 10px 40px rgba(0,0,0,0.15)",
       maxWidth: "900px",
-      margin: "auto"
+      margin: "auto",
+      color: dark ? "#fff" : "#000" // ✅ FIX
     },
 
     row: {
@@ -214,8 +215,6 @@ function App() {
 
   return (
     <div style={styles.app}>
-      
-      {/* SIDEBAR */}
       <div style={styles.sidebar}>
         <h2>🚀 AI Cleaner</h2>
 
@@ -239,7 +238,6 @@ function App() {
         </button>
       </div>
 
-      {/* MAIN */}
       <div style={styles.main}>
         <h1 style={{ textAlign: "center" }}>
           AI Data Cleaner Dashboard
@@ -247,7 +245,6 @@ function App() {
 
         {loading && <p style={{ textAlign: "center" }}>⏳ Processing...</p>}
 
-        {/* UPLOAD */}
         {active === "upload" && (
           <div style={styles.card}>
             <h2>📁 Upload Data</h2>
@@ -255,7 +252,8 @@ function App() {
             <div style={styles.row}>
               <input type="file" onChange={uploadFile} />
 
-              <a href="http://127.0.0.1:8000/download">
+              {/* ✅ FIXED */}
+              <a href={`${API}/download`}>
                 <button style={styles.button}>⬇ Download</button>
               </a>
 
@@ -266,7 +264,6 @@ function App() {
           </div>
         )}
 
-        {/* CHARTS */}
         {active === "charts" && data && (
           <div style={styles.card}>
             <h2>📊 Charts</h2>
@@ -291,7 +288,6 @@ function App() {
           </div>
         )}
 
-        {/* INSIGHTS + PREDICTION */}
         {active === "insights" && data && (
           <div style={styles.card}>
             <h2>🧠 Insights</h2>
@@ -304,7 +300,6 @@ function App() {
             <p>Score: {data?.quality?.score ?? 0}/100</p>
             <p>Missing: {data?.quality?.missing_percent ?? 0}%</p>
 
-            {/* 🔥 LIVE PREDICTION */}
             <hr style={{ margin: "20px 0" }} />
 
             <h3>🤖 Live Prediction</h3>
